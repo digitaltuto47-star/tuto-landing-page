@@ -1,4 +1,4 @@
-// c:\tuto\assets\js\slider\BaseSlider.js
+// c:	uto\assets\js\slider\BaseSlider.js
 
 /**
  * 모든 슬라이더 컴포넌트의 기본이 되는 추상 클래스입니다.
@@ -46,6 +46,11 @@ class BaseSlider {
 
         this.allSlides = []; // 모든 슬라이드 DOM 요소를 담을 배열
         this.draggableElement = null; // 실제로 드래그되고 transform이 적용될 DOM 요소 (하위 클래스에서 설정)
+
+        // bind 'this' for event handlers
+        this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDragging = this.handleDragging.bind(this);
+        this.handleDragEnd = this.handleDragEnd.bind(this);
     }
 
     /**
@@ -123,80 +128,122 @@ class BaseSlider {
     }
 
     // --- 공통 드래그 로직 ---
-    dragStart(e) {
-        if (!this.draggableElement || this.data.length <= 1) return; // 슬라이드가 1개 이하면 드래그 비활성화
-        if (this.state.isAnimating) return; // [추가] 애니메이션 중에는 드래그 방지
+    handleDragStart(e) {
+        if (e.type === 'mousedown' && e.button !== 0) return; // 좌클릭만 허용
+        if (e.type === 'mousedown') {
+            e.preventDefault(); // 더블클릭 시 텍스트 선택 방지
+        }
+        if (!this.draggableElement || this.data.length <= 1 || this.state.isAnimating) return;
+        
         this.stopAutoplay();
         this.state.isDragging = true;
-        this.state.startX = (e.touches ? e.touches[0].clientX : e.clientX);
-        this.draggableElement.classList.add('no-transition'); // CSS에 'no-transition' 클래스가 있다고 가정
+        this.state.startX = e.touches ? e.touches[0].clientX : e.clientX;
+        this.draggableElement.style.transition = 'none';
+
+        window.addEventListener('mousemove', this.handleDragging);
+        window.addEventListener('touchmove', this.handleDragging, { passive: false });
+        window.addEventListener('mouseup', this.handleDragEnd, { once: true });
+        window.addEventListener('touchend', this.handleDragEnd, { once: true });
     }
 
-    dragging(e) {
-        if (!this.state.isDragging || !this.draggableElement) return;
-        // 모바일에서 좌우 스크롤 시 페이지 상하 스크롤 방지
+    handleDragging(e) {
+        if (!this.state.isDragging) return;
         if (e.type === 'touchmove') {
-            e.preventDefault();
+            e.preventDefault(); // 모바일에서 스크롤 방지
         }
-        this.state.currentX = (e.touches ? e.touches[0].clientX : e.clientX);
+        this.state.currentX = e.touches ? e.touches[0].clientX : e.clientX;
         this.state.diffX = this.state.currentX - this.state.startX;
-        this.updatePosition(this.state.diffX, false); // 드래그 중에는 애니메이션 없이 위치 업데이트
+        this.updatePosition(this.state.diffX, false);
     }
 
-    dragEnd() {
-        if (!this.state.isDragging || !this.draggableElement) return;
-        this.state.isDragging = false;
-        this.draggableElement.classList.remove('no-transition');
+    handleDragEnd() {
+        if (!this.state.isDragging) return;
+        
+        window.removeEventListener('mousemove', this.handleDragging);
+        window.removeEventListener('touchmove', this.handleDragging);
 
-        // 드래그 임계값 (슬라이드 너비의 1/4)
+        this.state.isDragging = false;
+        
         const threshold = this.allSlides[0].offsetWidth / 4;
 
         if (Math.abs(this.state.diffX) > threshold) {
-            // 임계값을 넘으면 다음/이전 슬라이드로 이동
             this.state.diffX < 0 ? this.moveToNext() : this.moveToPrev();
         } else {
-            // 임계값을 넘지 않으면 제자리로 복귀
             this.moveTo(this.state.currentIndex);
         }
 
         this.state.diffX = 0;
-        this.startAutoplay();
+        if (this.config.autoplayInterval > 0) {
+            this.startAutoplay();
+        }
+    }
+
+    // --- 상태 초기화 로직 ---
+    resetState() {
+        // 1. 드래그 상태 및 관련 이벤트 리스너 강제 종료
+        if (this.state.isDragging) {
+            window.removeEventListener('mousemove', this.handleDragging);
+            window.removeEventListener('touchmove', this.handleDragging);
+            // mouseup/touchend는 once: true이므로 이미 제거되었을 가능성이 높지만, 안전을 위해 호출.
+            window.removeEventListener('mouseup', this.handleDragEnd);
+            window.removeEventListener('touchend', this.handleDragEnd);
+        }
+        
+        // 2. 모든 핵심 상태 변수 초기화
+        this.state.isDragging = false;
+        this.state.isAnimating = false;
+        this.state.startX = 0;
+        this.state.currentX = 0;
+        this.state.diffX = 0;
+
+        // 3. 현재 인덱스를 기준으로 슬라이드 위치를 애니메이션 없이 즉시 재설정
+        this.moveTo(this.state.currentIndex, false);
+
+        // 4. 자동 재생 재시작
+        if (this.config.autoplayInterval > 0) {
+            this.startAutoplay();
+        }
     }
 
     // --- 공통 이벤트 바인딩 ---
-    bindEvents() {
-        // 드래그 시작 이벤트는 wrapper에 바인딩
-        this.wrapper.addEventListener('mousedown', this.dragStart.bind(this));
-        this.wrapper.addEventListener('touchstart', this.dragStart.bind(this), { passive: true });
+  bindEvents() {
+    if (!this.wrapper) return;
 
-        // 드래그 중/종료 이벤트는 window에 바인딩하여 마우스가 요소를 벗어나도 추적
-        const dragHandler = this.dragging.bind(this);
-        const dragEndHandler = () => {
-            window.removeEventListener('mousemove', dragHandler);
-            window.removeEventListener('touchmove', dragHandler);
-            this.dragEnd();
-        };
+    // 1. 우클릭 시 나타나는 컨텍스트 메뉴를 방지합니다.
+    this.wrapper.addEventListener('contextmenu', e => e.preventDefault());
 
-        this.wrapper.addEventListener('mousedown', () => {
-            window.addEventListener('mousemove', dragHandler);
-            window.addEventListener('mouseup', dragEndHandler, { once: true });
-        });
-        this.wrapper.addEventListener('touchstart', () => {
-            window.addEventListener('touchmove', dragHandler, { passive: false });
-            window.addEventListener('touchend', dragEndHandler, { once: true });
-        });
+    // 2. 더블클릭 발생 시 기본 동작을 막고, 슬라이더 상태를 강제로 초기화하여
+    //    예기치 않은 상태(드래그 중단 등)에 빠지는 문제를 해결합니다.
+    this.wrapper.addEventListener('dblclick', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.resetState();
+    });
 
-        // 자동 재생 제어 (호버 시 일시 정지)는 wrapper에 바인딩
-        if (this.wrapper) {
-            this.wrapper.addEventListener('mouseenter', () => this.stopAutoplay());
-            this.wrapper.addEventListener('mouseleave', () => this.startAutoplay());
-        }
+    // 3. 드래그 시작 이벤트를 wrapper에 바인딩합니다.
+    this.wrapper.addEventListener('mousedown', this.handleDragStart);
+    this.wrapper.addEventListener('touchstart', this.handleDragStart, { passive: true });
 
-        // 선택적: 무한 루프 처리 등을 위한 transitionend 이벤트
-        if (this.draggableElement) {
-            this.draggableElement.addEventListener('transitionend', this.handleTransitionEnd.bind(this));
-        }
+    // 4. 드래그 가능한 요소(이미지 래퍼 등)에도 직접 이벤트를 바인딩합니다.
+    if (this.draggableElement) {
+        // 'draggableElement'에서도 mousedown/touchstart를 처리해야
+        // 이미지 위에서 드래그를 시작할 수 있습니다.
+        this.draggableElement.addEventListener('mousedown', this.handleDragStart);
+        this.draggableElement.addEventListener('touchstart', this.handleDragStart, { passive: true });
+        
+        this.draggableElement.addEventListener(
+            'transitionend',
+            this.handleTransitionEnd.bind(this)
+        );
     }
+
+    // 5. 자동 재생 제어 (마우스 호버 시 일시정지/재시작)
+    if (this.config.autoplayInterval > 0) {
+        this.wrapper.addEventListener('mouseenter', () => this.stopAutoplay());
+        this.wrapper.addEventListener('mouseleave', () => this.startAutoplay());
+    }
+  }
+
 }
 
 export default BaseSlider;

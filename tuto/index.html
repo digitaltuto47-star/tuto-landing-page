@@ -52,7 +52,7 @@
             transition: all 0.3s ease;
             position: relative; 
             overflow: hidden;
-        }
+        }ㅅ
         .dark .cta-button {
             color: #ffffff;
         }
@@ -209,7 +209,7 @@
 
         /* --- SLIDESHOW STYLES --- */
         .slideshow-outer-wrapper {
-            height: 450px; margin: 0 auto; overflow: hidden; position: relative;
+            height: 800px; margin: 0 auto; overflow: hidden; position: relative;
             width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
             padding: 0; box-sizing: border-box;
         }
@@ -326,65 +326,67 @@
     </style>
     <style>
         @media (max-width: 640px) {
-            /* Hero Section */
-            #hero {
-                padding-top: 6rem; /* 96px */
-                padding-bottom: 4rem; /* 64px */
-            }
-            #hero h1 {
-                font-size: 2.5rem; /* Reduced from 4xl/6xl/7xl */
-                line-height: 1.2;
-            }
-            #hero h1 .text-3xl {
-                font-size: 1.8rem;
+            /* --- General --- */
+            body {
+                -webkit-text-size-adjust: 100%; /* Prevent iOS font size inflation. */
+                padding-bottom: 5rem; /* [FIX] Add safe area at the bottom */
             }
 
-            /* Slideshow */
+            h1 { font-size: 2.25rem; line-height: 1.2; } /* 36px */
+            h2 { font-size: 1.75rem; } /* 28px */
+            section { padding-top: 3.5rem; padding-bottom: 3.5rem; }
+
+            /* --- Hero Section --- */
+            #hero { padding-top: 5rem; padding-bottom: 3rem; }
+            #hero h1 { font-size: 2.5rem; }
+            #hero h1 .text-3xl { font-size: 1.5rem; } /* Further reduce sub-heading size */
+            #hero p { font-size: 1rem; }
+
+            /* --- Slideshow --- */
             .slideshow-outer-wrapper {
-                height: 300px; /* Reduced from 450px */
+                height: auto; /* Let aspect ratio control the height */
+                aspect-ratio: 16 / 9; /* Common aspect ratio, better than fixed height */
+                max-height: 60vh; /* Set a max height relative to viewport */
             }
-            .slide {
-                width: calc(100vw - 40px); /* Adjust for smaller screens */
-            }
+            .slide { width: calc(100vw - 60px); } /* A bit more padding on the sides */
 
-            /* Bubble Cloud */
+            /* --- [CRITICAL FIX] Bubble Cloud --- */
             .bubble-cloud-container {
-                min-height: 350px; /* Reduce min-height */
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: center;
+                gap: 12px;
+                min-height: auto; /* Override fixed min-height */
+                height: auto;
+                padding: 1rem 0;
             }
             .thought-bubble {
-                font-size: 0.8rem; /* Smaller text on bubbles */
-                padding: 6px 12px;
-            }
-            .thought-bubble.text-xl, .thought-bubble.text-lg, .thought-bubble.text-2xl {
-                font-size: 1rem; /* Normalize larger bubbles */
-            }
-
-            /* Section Paddings */
-            section {
-                padding-top: 4rem;
-                padding-bottom: 4rem;
-            }
-            #features, #courses {
-                padding-top: 4rem;
-            }
-
-            /* Headings */
-            h2 {
-                font-size: 1.875rem; /* 3xl */
-            }
-
-            /* Feature Cards */
-            .feature-card p {
+                position: static; /* Override absolute positioning */
+                transform: none !important; /* Reset transforms */
+                animation: none !important; /* Disable animations */
                 font-size: 0.875rem;
+                padding: 8px 16px;
+            }
+            /* Hide less important bubbles on mobile to reduce clutter */
+            .thought-bubble.filler,
+            .thought-bubble.bubble-problem,
+            .thought-bubble.bubble-need {
+                display: none;
+            }
+            /* Only show the most important "goal" bubbles */
+            .thought-bubble.bubble-goal {
+                display: inline-block;
+                font-size: 1rem;
+                font-weight: 700;
             }
 
-            /* Course Options */
-            #course-options .grid {
-                gap: 1rem;
-            }
 
-            /* Forms */
-            #consultation .p-8, #tutor-register .p-8 {
+            /* --- Course Options --- */
+            #course-options .grid { gap: 1.5rem; }
+
+            /* --- Forms --- */
+            #consultation .p-8, #tutor-register .p-8, #consultation .p-12, #tutor-register .p-12 {
                 padding: 1.5rem;
             }
         }

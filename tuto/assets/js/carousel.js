@@ -32,13 +32,14 @@ class Carousel extends BaseSlider {
     createSlideHTML(item, index, isClone = false) {
         const tag = item.type === 'video'
             ? `<video src="${item.src}" class="w-full h-full object-cover" autoplay loop muted playsinline poster="${item.poster}" aria-label="${item.alt}"></video>`
-            : `<img src="${item.src}" alt="${item.alt}" class="w-full h-full object-cover" loading="lazy" decoding="async" draggable="false">`;
+            : `<img src="${item.src}" alt="${item.alt}" class="w-full h-full object-cover" loading="lazy" decoding="async">`;
 
         return /*html*/`
             <div class="slide ${isClone ? 'clone' : ''} select-none" tabindex="${isClone ? -1 : 0}" data-index="${index}">
                 <div class="slide-content-wrapper">
                     ${tag}
                     <div class="caption-overlay">${item.caption}</div>
+                    <div class="slide-event-overlay"></div>
                 </div>
             </div>
         `;
