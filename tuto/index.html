@@ -324,6 +324,71 @@
         }
 
     </style>
+    <style>
+        @media (max-width: 640px) {
+            /* Hero Section */
+            #hero {
+                padding-top: 6rem; /* 96px */
+                padding-bottom: 4rem; /* 64px */
+            }
+            #hero h1 {
+                font-size: 2.5rem; /* Reduced from 4xl/6xl/7xl */
+                line-height: 1.2;
+            }
+            #hero h1 .text-3xl {
+                font-size: 1.8rem;
+            }
+
+            /* Slideshow */
+            .slideshow-outer-wrapper {
+                height: 300px; /* Reduced from 450px */
+            }
+            .slide {
+                width: calc(100vw - 40px); /* Adjust for smaller screens */
+            }
+
+            /* Bubble Cloud */
+            .bubble-cloud-container {
+                min-height: 350px; /* Reduce min-height */
+            }
+            .thought-bubble {
+                font-size: 0.8rem; /* Smaller text on bubbles */
+                padding: 6px 12px;
+            }
+            .thought-bubble.text-xl, .thought-bubble.text-lg, .thought-bubble.text-2xl {
+                font-size: 1rem; /* Normalize larger bubbles */
+            }
+
+            /* Section Paddings */
+            section {
+                padding-top: 4rem;
+                padding-bottom: 4rem;
+            }
+            #features, #courses {
+                padding-top: 4rem;
+            }
+
+            /* Headings */
+            h2 {
+                font-size: 1.875rem; /* 3xl */
+            }
+
+            /* Feature Cards */
+            .feature-card p {
+                font-size: 0.875rem;
+            }
+
+            /* Course Options */
+            #course-options .grid {
+                gap: 1rem;
+            }
+
+            /* Forms */
+            #consultation .p-8, #tutor-register .p-8 {
+                padding: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body class="antialiased">
 
