@@ -1,0 +1,233 @@
+/* ==========================================================================
+   Global Styles
+   ========================================================================== */
+
+body {
+    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+    background-color: #f9fafb; /* bg-gray-50 */
+    transition: background-color 0.3s ease;
+}
+
+html.dark body {
+    background-color: #111827; /* bg-gray-900 */
+}
+
+/* ==========================================================================
+   Header & Menu Styles
+   ========================================================================== */
+
+/* Search Bar Animation */
+#search-bar-container {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 40; /* 헤더보다 아래에 있도록 z-index 추가 */
+}
+
+/* Theme Selector Animation */
+#theme-indicator {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    background-color: white;
+    border-radius: 9999px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+html.dark #theme-indicator {
+    background-color: #1F2937; /* gray-800 */
+}
+
+/* ==========================================================================
+   Slideshow Styles (Main Page)
+   ========================================================================== */
+
+.slideshow-outer-wrapper {
+    /* Mobile First: 4:3 Vertical Aspect Ratio */
+    padding-top: 166.75%;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    width: 100%; 
+}
+
+/* [FIX] On desktop, limit the max height */
+@media (min-width: 768px) { /* md breakpoint */
+    .slideshow-outer-wrapper {
+        max-height: 40vh; /* [FIX] Reduced height by half */
+    }
+}
+
+        .slideshow-container-inner {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            cursor: default; overflow: visible; z-index: 1;
+            /* [FIX] Disable user selection and native drag to prevent interference */
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-drag: none;
+        }.slideshow-container-inner:active { cursor: grabbing; }
+.img-wrapper {
+    display: flex; width: fit-content; height: 100%; position: relative;
+    gap: 20px; 
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+    transform: translateZ(0);
+}
+.slide {
+    width: 45vw; /* [FIX] Reduced slide width */
+    max-width: 600px; /* [FIX] Reduced max-width */
+    aspect-ratio: 2 / 9; flex-shrink: 0;
+    opacity: 0.4; filter: brightness(0.7);
+    transition: transform 0.25s ease-out, opacity 0.25s ease-out, filter 0.25s ease-out; 
+    transform: scale(0.8);
+    border-radius: 12px; overflow: hidden; position: relative; /* [FIX] Removed cursor: pointer */
+}.slide.active {
+    opacity: 1; filter: brightness(1); 
+    transform: scale(1); 
+}
+.img-wrapper.no-transition { transition: none !important; }
+.slide-content-wrapper { position: relative; width: 100%; height: 100%; }
+
+/* [FIX] Prevent native image/video drag behavior */
+.slide-content-wrapper > img,
+.slide-content-wrapper > video {
+    pointer-events: none;
+}
+.caption-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 2rem 1rem 1rem;
+    text-align: center; font-size: 0.95rem; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Review Slideshow Styles (Main Page)
+   ========================================================================== */
+
+#review-slideshow-container {
+    position: relative;
+}
+#review-slideshow-wrapper {
+    overflow: hidden;
+    cursor: grab;
+}
+#review-slideshow {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* ==========================================================================
+   Component Styles
+   ========================================================================== */
+
+/* CTA Buttons (Main Page) */
+.cta-button {
+    background-image: linear-gradient(to right, #f97316 0%, #ec4899 100%); 
+    transition: all 0.3s ease;
+}
+.cta-button:hover {
+    box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.5), 0 4px 6px -2px rgba(236, 72, 153, 0.1);
+    transform: translateY(-2px);
+}
+.cta-button-secondary {
+    background-image: linear-gradient(to right, #10b981 0%, #22c55e 100%); 
+    transition: all 0.3s ease;
+}
+.cta-button-secondary:hover {
+    box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4), 0 4px 6px -2px rgba(34, 197, 94, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Recommendation Filter Buttons (Main Page) */
+.rec-filter-btn {
+    padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
+    background-color: #f3f4f6; /* gray-100 */ color: #1f2937; /* gray-800 */
+}
+html.dark .rec-filter-btn {
+    background-color: #374151; /* gray-700 */ color: #d1d5db; /* gray-300 */
+}
+.rec-filter-btn.active, .rec-filter-btn:hover {
+    background-color: #db2777; /* pink-600 */
+    color: #ffffff;
+}
+
+/* Toggle Switch (Create Lecture Page) */
+.toggle-switch-container {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.toggle-switch-indicator {
+    position: absolute;
+    height: calc(100% - 0.25rem); /* p-0.5 */
+    top: 0.125rem; /* p-0.5 */
+    background-color: white;
+    border-radius: 9999px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+html.dark .toggle-switch-indicator { background-color: #374151; /* gray-700 */ }
+
+/* Custom Radio Button (Signup Page) */
+.role-radio:checked + label {
+    border-color: #f97316; /* orange-500 */
+    background-color: #f97316; /* orange-500 */
+}
+.role-radio:checked + label span {
+    color: white;
+}
+html.dark .role-radio:checked + label {
+    border-color: #fb923c; /* orange-400 */
+    background-color: #ea580c; /* orange-600 */
+}
+
+/* Floating Help Button */
+.floating-help-btn {
+    position: fixed;
+    bottom: 1.5rem; /* 24px */
+    left: 1.5rem; /* 24px */
+    z-index: 40;
+    transition: transform 0.3s ease;
+}
+.floating-help-btn:hover {
+    transform: translateY(-4px);
+}
+
+/* [NEW] Carousel Navigation Buttons */
+.carousel-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #111827;
+    border-radius: 9999px;
+    width: 44px; /* 11 in tailwindcss */
+    height: 44px; /* 11 in tailwindcss */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.carousel-nav-btn:hover {
+    background-color: white;
+    transform: translateY(-50%) scale(1.1);
+}
+.dark .carousel-nav-btn {
+    background-color: rgba(31, 41, 55, 0.7);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.dark .carousel-nav-btn:hover {
+    background-color: #374151; /* gray-700 */
+}
+.carousel-nav-btn.left-2 { left: 0.5rem; }
+.carousel-nav-btn.right-2 { right: 0.5rem; }
+@media (min-width: 640px) { /* sm breakpoint */
+    .carousel-nav-btn.sm\:left-4 { left: 1rem; }
+    .carousel-nav-btn.sm\:right-4 { right: 1rem; }
+}
